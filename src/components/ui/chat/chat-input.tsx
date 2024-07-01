@@ -99,10 +99,10 @@ export default function ChatInput(
           onChange={handleInputChange}
           onKeyDown={handleKeyPress}
         />
-        {/* <FileUploader
+        <FileUploader
           onFileUpload={handleUploadFile}
           onFileError={props.onFileError}
-        /> */}
+        />
         <Button disabled={props.isLoading} onClick={onSubmit}>
           Send message
         </Button>

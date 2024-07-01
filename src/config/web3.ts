@@ -16,7 +16,7 @@ if (!projectId) throw new Error("Project ID is not defined")
 const metadata = {
   name: "Hive Network",
   description: "Decentralized AI Agent Network",
-  url: "https://app.hivenetwork.ai",
+  url: "https://hivenetwork.ai",
   icons: ["https://avatars.mywebsite.com/"],
 }
 
