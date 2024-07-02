@@ -8,7 +8,6 @@ import "react-toastify/dist/ReactToastify.css"
 import React from "react"
 
 import { Web3ModalProvider } from "../context/Web3ModalProvider"
-import StoreProvider from "@/context/StoreProvider"
 
 const inter: NextFont = Inter({ subsets: ["latin"] })
 
@@ -25,9 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Web3ModalProvider>
-          <StoreProvider>{children}</StoreProvider>
-        </Web3ModalProvider>
+        <Web3ModalProvider>{children}</Web3ModalProvider>
         <ToastContainer />
       </body>
     </html>
