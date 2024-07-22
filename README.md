@@ -27,5 +27,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `npm start`
 
 ## Learn More
+Join our Discord community for support and discussion.
+
+[![](https://dcbadge.limes.pink/api/server/vnJvW4wZp9)](https://discord.gg/vnJvW4wZp9)
 
 https://hivenetwork.ai
