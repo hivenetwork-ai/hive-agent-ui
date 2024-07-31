@@ -8,7 +8,7 @@ export const uploadFile = async (files: File[]) => {
 
   try {
     const response = await axios.post(
-      `${API_URL}/upload_files?agent_id=${agentId}`,
+      `${API_URL}/api/v1/uploadfiles`,
       formData,
       {
         headers: {
