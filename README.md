@@ -1,6 +1,6 @@
-# Hive Agent UI
+# Swarm Agent UI
 
-User Interface that integrates with a Hive Agent.
+User Interface that integrates with a Swarm Zero Agent.
 
 Join our Discord community for support and discussion.
 
@@ -15,6 +15,7 @@ npm install
 ```
 
 Second, make a copy of the [.env.example](.env.example) file, rename it to `.env` and update the values accordingly.
+
 > **NOTE:** _You can retrieve a WalletConnect Project ID from https://walletconnect.com._
 
 Finally, run the development server:
@@ -32,4 +33,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Learn More
 
-https://hivenetwork.ai
+https://swarmzero.ai/
