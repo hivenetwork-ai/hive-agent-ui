@@ -13,8 +13,8 @@ export default function Header() {
         >
           <Image
             className="rounded-xl"
-            src="/swarm_zero_mark.png"
-            alt="Swarm Zero Logo"
+            src="/swarmzero_mark.png"
+            alt="SwarmZero Logo"
             width={242}
             height={48}
             priority

@@ -1,6 +1,6 @@
 # Swarm Agent UI
 
-User Interface that integrates with a Swarm Zero Agent.
+User Interface that integrates with a SwarmZero Agent.
 
 Join our Discord community for support and discussion.
 
