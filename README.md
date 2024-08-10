@@ -1,4 +1,4 @@
-# Swarm Agent UI
+# SwarmZero Agent UI
 
 User Interface that integrates with a SwarmZero Agent.
 
