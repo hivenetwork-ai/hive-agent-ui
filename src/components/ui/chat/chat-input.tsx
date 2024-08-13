@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { ChangeEvent, useState } from "react"
 import { Button } from "../button"
 import FileUploader from "../file-uploader"
 import UploadImagePreview from "../upload-image-preview"
@@ -6,15 +6,16 @@ import { ChatHandler } from "./chat.interface"
 import { toast } from "react-toastify"
 import { Textarea } from "../textarea"
 
+const DEFAULT_FILE_SIZE_LIMIT = 1024 * 1024 * 5
+const allowedExtensions = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+
 export default function ChatInput(
-  props: Pick<
-    ChatHandler,
-    "handleSubmit" | "multiModal" | "isLoading" | "onFileUpload" | "onFileError"
-  > & {
+  props: Pick<ChatHandler, "handleSubmit" | "multiModal" | "isLoading"> & {
     multiModal?: boolean
   }
 ) {
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [input, setInput] = useState<string>("")
 
   const onSubmit = () => {
@@ -25,9 +26,8 @@ export default function ChatInput(
       return
     }
 
-    if (imageUrl) {
-      formData.image = imageUrl
-      setImageUrl(null)
+    if (selectedFiles.length > 0) {
+      formData.files = selectedFiles
     }
 
     const chatData: any = {
@@ -45,29 +45,18 @@ export default function ChatInput(
 
     props.handleSubmit(formData)
     setInput("")
+    setSelectedFiles([])
+    setPreviewUrls([])
   }
 
-  const onRemovePreviewImage = () => setImageUrl(null)
+  const onRemovePreviewImage = (index: number) => {
+    const updatedFiles = [...selectedFiles]
+    const updatedUrls = [...previewUrls]
+    updatedFiles.splice(index, 1)
+    updatedUrls.splice(index, 1)
 
-  const handleUploadImageFile = async (file: File) => {
-    const base64 = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = (error) => reject(error)
-    })
-    setImageUrl(base64)
-  }
-
-  const handleUploadFile = async (file: File) => {
-    try {
-      if (props.multiModal && file.type.startsWith("image/")) {
-        return await handleUploadImageFile(file)
-      }
-      props.onFileUpload?.(file)
-    } catch (error: any) {
-      props.onFileError?.(error.message)
-    }
+    setSelectedFiles(updatedFiles)
+    setPreviewUrls(updatedUrls)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -84,12 +73,55 @@ export default function ChatInput(
     }
   }
 
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || [])
+
+    // Filter out files
+    const validImageTypes = allowedExtensions
+    const validFiles = files.filter((file) => {
+      validImageTypes.includes(file.type)
+      if (!validImageTypes.includes(file.type)) {
+        toast.warn(
+          `${file.name} is not a valid image file and will be removed.`
+        )
+        return false
+      }
+      if (file.size > DEFAULT_FILE_SIZE_LIMIT) {
+        toast.warn(
+          `${file.name} exceeds the 5MB size limit and will be removed.`
+        )
+        return false
+      }
+      return true
+    })
+
+    setSelectedFiles((prevs) => [...prevs, ...validFiles])
+
+    const urls = validFiles.map((file) => URL.createObjectURL(file))
+    setPreviewUrls((prevs) => [...prevs, ...urls])
+  }
+
+  const fileConfig = {
+    allowedExtensions,
+  }
+
   return (
-    <div className="rounded-xl bg-white p-4 shadow-xl space-y-4">
-      {imageUrl && (
-        <UploadImagePreview url={imageUrl} onRemove={onRemovePreviewImage} />
-      )}
-      <div className="flex w-full items-start justify-between gap-4 ">
+    <div className="flex flex-col rounded-xl bg-white p-4 shadow-xl">
+      <div className="flex items-center gap-2 flex-wrap">
+        {previewUrls.length > 0 &&
+          previewUrls.map((url, index) => (
+            <UploadImagePreview
+              url={url}
+              key={url}
+              onRemove={() => onRemovePreviewImage(index)}
+            />
+          ))}
+      </div>
+      <div
+        className={`flex w-full items-start justify-between gap-4 ${
+          previewUrls.length > 0 && "mt-4"
+        }`}
+      >
         <Textarea
           autoFocus
           name="message"
@@ -100,8 +132,9 @@ export default function ChatInput(
           onKeyDown={handleKeyPress}
         />
         <FileUploader
-          onFileUpload={handleUploadFile}
-          onFileError={props.onFileError}
+          config={fileConfig}
+          handleFileChange={handleFileChange}
+          // onFileError={props.onFileError}
         />
         <Button disabled={props.isLoading} onClick={onSubmit}>
           Send message
