@@ -86,7 +86,7 @@ export default function ChatSection() {
   }
 
   return (
-    <div className="space-y-4 max-w-5xl w-full">
+    <div className="space-y-2 md:space-y-4 max-w-5xl w-full flex-grow">
       <ChatMessages
         messages={transformedMessages}
         isLoading={isLoading}

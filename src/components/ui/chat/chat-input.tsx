@@ -74,6 +74,7 @@ export default function ChatInput(
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    console.log("first")
     const files = Array.from(event.target.files || [])
 
     // Filter out files
@@ -106,7 +107,7 @@ export default function ChatInput(
   }
 
   return (
-    <div className="flex flex-col rounded-xl bg-white p-4 shadow-xl">
+    <div className="flex flex-col rounded-xl bg-white p-2 md:p-4 shadow-xl">
       <div className="flex items-center gap-2 flex-wrap">
         {previewUrls.length > 0 &&
           previewUrls.map((url, index) => (
@@ -118,8 +119,8 @@ export default function ChatInput(
           ))}
       </div>
       <div
-        className={`flex w-full items-start justify-between gap-4 ${
-          previewUrls.length > 0 && "mt-4"
+        className={`flex flex-col md:flex-row w-full items-start justify-between gap-2 md:gap-4 ${
+          previewUrls.length > 0 && "mt-1 md:mt-4"
         }`}
       >
         <Textarea
@@ -131,14 +132,16 @@ export default function ChatInput(
           onChange={handleInputChange}
           onKeyDown={handleKeyPress}
         />
-        <FileUploader
-          config={fileConfig}
-          handleFileChange={handleFileChange}
-          // onFileError={props.onFileError}
-        />
-        <Button disabled={props.isLoading} onClick={onSubmit}>
-          Send message
-        </Button>
+        <div className="flex items-center gap-2">
+          <FileUploader
+            config={fileConfig}
+            handleFileChange={handleFileChange}
+            // onFileError={props.onFileError}
+          />
+          <Button disabled={props.isLoading} onClick={onSubmit}>
+            Send message
+          </Button>
+        </div>
       </div>
     </div>
   )

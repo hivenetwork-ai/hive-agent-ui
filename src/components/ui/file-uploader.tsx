@@ -35,7 +35,7 @@ export default function FileUploader({
         type="file"
         id={inputId}
         style={{ display: "none" }}
-        onChange={handleFileChange}
+        onChange={(e) => handleFileChange(e)}
         accept={allowedExtensions?.join(",")}
         disabled={config?.disabled || uploading}
         multiple

@@ -9,6 +9,7 @@ const config: Config = {
       center: true,
       padding: "2rem",
       screens: {
+        "md": "768px",
         "2xl": "1400px",
       },
     },
