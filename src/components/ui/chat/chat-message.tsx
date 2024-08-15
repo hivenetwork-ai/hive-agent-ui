@@ -1,22 +1,22 @@
-import { Check, Copy } from "lucide-react";
+import { Check, Copy } from "lucide-react"
 
-import { JSONValue, Message } from "ai";
-import Image from "next/image";
-import { Button } from "../button";
-import ChatAvatar from "./chat-avatar";
-import Markdown from "./markdown";
-import { useCopyToClipboard } from "./use-copy-to-clipboard";
+import { JSONValue, Message } from "ai"
+import Image from "next/image"
+import { Button } from "../button"
+import ChatAvatar from "./chat-avatar"
+import Markdown from "./markdown"
+import { useCopyToClipboard } from "./use-copy-to-clipboard"
 
 interface ChatMessageImageData {
-  type: "image_url";
+  type: "image_url"
   image_url: {
-    url: string;
-  };
+    url: string
+  }
 }
 
 // This component will parse message data and render the appropriate UI.
 function ChatMessageData({ messageData }: { messageData: JSONValue }) {
-  const { image_url, type } = messageData as unknown as ChatMessageImageData;
+  const { image_url, type } = messageData as unknown as ChatMessageImageData
   if (type === "image_url") {
     return (
       <div className="rounded-md max-w-[200px] shadow-md">
@@ -29,15 +29,15 @@ function ChatMessageData({ messageData }: { messageData: JSONValue }) {
           alt=""
         />
       </div>
-    );
+    )
   }
-  return null;
+  return null
 }
 
 export default function ChatMessage(chatMessage: Message) {
-  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 });
+  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
   return (
-    <div className="flex items-start gap-4 pr-5 pt-5">
+    <div className="flex items-start gap-2 md:gap-4 pr-2 md:pr-5 pt-2 md:pt-5">
       <ChatAvatar role={chatMessage.role} />
       <div className="group flex flex-1 justify-between gap-2">
         <div className="flex-1 space-y-4">
@@ -60,5 +60,5 @@ export default function ChatMessage(chatMessage: Message) {
         </Button>
       </div>
     </div>
-  );
+  )
 }
