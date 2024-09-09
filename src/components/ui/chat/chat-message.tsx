@@ -1,4 +1,4 @@
-import { Check, Copy } from "lucide-react"
+import { Check, Copy, SendHorizontal } from "lucide-react"
 
 import { JSONValue, Message } from "ai"
 import Image from "next/image"
@@ -6,6 +6,7 @@ import { Button } from "../button"
 import ChatAvatar from "./chat-avatar"
 import Markdown from "./markdown"
 import { useCopyToClipboard } from "./use-copy-to-clipboard"
+import { useSharedRef } from "@/context/RefProvider"
 
 interface ChatMessageImageData {
   type: "image_url"
@@ -36,6 +37,15 @@ function ChatMessageData({ messageData }: { messageData: JSONValue }) {
 
 export default function ChatMessage(chatMessage: Message) {
   const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
+  const inputRef = useSharedRef()
+
+  const handleClickSuggestedQuestion = (question: string) => {
+    if (inputRef?.current) {
+      inputRef.current.value = question
+      inputRef.current.dispatchEvent(new Event("input"))
+    }
+  }
+
   return (
     <div className="flex items-start gap-2 md:gap-4 pr-2 md:pr-5 pt-2 md:pt-5">
       <ChatAvatar role={chatMessage.role} />
@@ -45,6 +55,43 @@ export default function ChatMessage(chatMessage: Message) {
             <ChatMessageData messageData={chatMessage.data} />
           )}
           <Markdown content={chatMessage.content} />
+          {chatMessage.role !== "user" && (
+            <div className="flex flex-col gap-2">
+              <div className="font-semibold flex items-center gap-1">
+                <SendHorizontal size={16} /> Suggested questions:
+              </div>
+              <div className="flex flex-col gap-1 ml-4">
+                <p
+                  className="w-fit text-sm hover:underline cursor-pointer"
+                  onClick={() =>
+                    handleClickSuggestedQuestion("What can you help me with?")
+                  }
+                >
+                  • What can you help me with?
+                </p>
+                <p
+                  className="w-fit text-sm hover:underline cursor-pointer"
+                  onClick={() =>
+                    handleClickSuggestedQuestion(
+                      "What tools do you have access to?"
+                    )
+                  }
+                >
+                  • What tools do you have access to?
+                </p>
+                <p
+                  className="w-fit text-sm hover:underline cursor-pointer"
+                  onClick={() =>
+                    handleClickSuggestedQuestion(
+                      "What’s an example of your capabilities?"
+                    )
+                  }
+                >
+                  • What’s an example of your capabilities?
+                </p>
+              </div>
+            </div>
+          )}
         </div>
         <Button
           onClick={() => copyToClipboard(chatMessage.content)}

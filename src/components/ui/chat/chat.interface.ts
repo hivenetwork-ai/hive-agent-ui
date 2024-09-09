@@ -10,6 +10,7 @@ export interface ChatHandler {
   messages: Message[]
   isLoading: boolean
   multiModal?: boolean
+  innerRef?: React.RefObject<HTMLTextAreaElement>
   reload?: () => void
   onFileUpload?: (file: File) => Promise<void>
   onFileError?: (errMsg: string) => void

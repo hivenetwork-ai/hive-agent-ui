@@ -1,14 +1,10 @@
 import { API_URL } from "@/config/constants"
 import axios from "axios"
 
-export const uploadFile = async (files: File[]) => {
-  const formData = new FormData()
-  const agentId = "demo123"
-  files.map((file) => formData.append("files", file))
-
+export const uploadFileAPI = async (formData: FormData) => {
   try {
     const response = await axios.post(
-      `${API_URL}/api/v1/uploadfiles`,
+      `${API_URL}/api/v1/uploadfiles/`,
       formData,
       {
         headers: {

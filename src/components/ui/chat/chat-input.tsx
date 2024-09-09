@@ -1,22 +1,38 @@
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
 import { Button } from "../button"
 import FileUploader from "../file-uploader"
 import UploadImagePreview from "../upload-image-preview"
 import { ChatHandler } from "./chat.interface"
 import { toast } from "react-toastify"
 import { Textarea } from "../textarea"
+import { useSharedRef } from "@/context/RefProvider"
 
 const DEFAULT_FILE_SIZE_LIMIT = 1024 * 1024 * 5
-const allowedExtensions = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+const allowedExtensions = [
+  "image/*",
+  "application/pdf",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".csv",
+  ".xlsx",
+  ".ppt",
+  ".pptx",
+  ".txt",
+  ".rtf",
+  ".epub",
+  ".json",
+  ".xml",
+]
 
 export default function ChatInput(
-  props: Pick<ChatHandler, "handleSubmit" | "multiModal" | "isLoading"> & {
-    multiModal?: boolean
-  }
+  props: Pick<ChatHandler, "handleSubmit" | "multiModal" | "isLoading">
 ) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [input, setInput] = useState<string>("")
+
+  const inputRef = useSharedRef()
 
   const onSubmit = () => {
     let formData: any = {}
@@ -106,6 +122,38 @@ export default function ChatInput(
     allowedExtensions,
   }
 
+  useEffect(() => {
+    if (inputRef?.current) {
+      const refElement = inputRef.current
+
+      const updateStateFromRef = () => {
+        setInput(refElement.value)
+      }
+
+      refElement.addEventListener("input", updateStateFromRef)
+
+      return () => {
+        refElement.removeEventListener("input", updateStateFromRef)
+      }
+    }
+  }, [inputRef])
+
+  useEffect(() => {
+    if (inputRef && inputRef.current) {
+      const refElement = inputRef.current
+
+      const syncStateWithRef = () => {
+        setInput(refElement.value)
+      }
+
+      refElement.addEventListener("input", syncStateWithRef)
+
+      return () => {
+        refElement.removeEventListener("input", syncStateWithRef)
+      }
+    }
+  }, [inputRef])
+
   return (
     <div className="flex flex-col rounded-xl bg-white p-2 md:p-4 shadow-xl">
       <div className="flex items-center gap-2 flex-wrap">
@@ -131,6 +179,7 @@ export default function ChatInput(
           value={input}
           onChange={handleInputChange}
           onKeyDown={handleKeyPress}
+          ref={inputRef}
         />
         <div className="flex items-center gap-2">
           <FileUploader
