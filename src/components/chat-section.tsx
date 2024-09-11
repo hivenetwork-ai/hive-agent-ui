@@ -10,6 +10,7 @@ import { sendChatAPI, sendChatMediaAPI } from "@/apis/chat"
 import { toast } from "react-toastify"
 import { uploadFileAPI } from "@/apis/fileupload"
 import { useSharedRef } from "@/context/RefProvider"
+import { Message } from "ai"
 
 export default function ChatSection() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -104,6 +105,27 @@ export default function ChatSection() {
     setIsLoading(false)
   }
 
+  const stop = async () => {}
+
+  const append = async (
+    message: Message | Omit<Message, "id">,
+    ops?: { data: any }
+  ): Promise<string | null | undefined> => {
+    try {
+      if (!message || !ops) {
+        return Promise.resolve(undefined)
+      }
+
+      // const response = await sendChatAPI(message, ops)
+      const response = await sendChatAPI(message)
+
+      return response
+    } catch (error) {
+      console.error("Error in append function:", error)
+      return Promise.resolve(null)
+    }
+  }
+
   const handleClickSuggestedQuestion = (question: string) => {
     if (inputRef && inputRef.current) {
       inputRef.current.value = question
@@ -158,6 +180,8 @@ export default function ChatSection() {
           messages={transformedMessages}
           isLoading={isLoading}
           reload={reload}
+          stop={stop}
+          append={append}
         />
       )}
 
