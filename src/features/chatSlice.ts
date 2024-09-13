@@ -1,8 +1,9 @@
+import { Message } from "ai"
 import { createSlice } from "@reduxjs/toolkit"
 import type { PayloadAction } from "@reduxjs/toolkit"
 
 export interface ChatState {
-  transformedMessages: any[]
+  transformedMessages: Message[]
 }
 
 const initialState: ChatState = {
