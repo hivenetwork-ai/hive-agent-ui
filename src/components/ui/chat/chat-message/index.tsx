@@ -1,12 +1,12 @@
-import { Fragment } from "react"
-import { Check, Copy, SendHorizontal } from "lucide-react"
+import { Fragment } from "react";
+import { Check, Copy, SendHorizontal } from "lucide-react";
 
-import { JSONValue, Message } from "ai"
-import { useSharedRef } from "@/context/RefProvider"
-import { useCopyToClipboard } from "../hooks/use-copy-to-clipboard"
-import ChatAvatar from "./chat-avatar"
-import { Button } from "../../button"
-import Markdown from "./markdown"
+import { JSONValue, Message } from "ai";
+import { useSharedRef } from "@/context/RefProvider";
+import { useCopyToClipboard } from "../hooks/use-copy-to-clipboard";
+import ChatAvatar from "./chat-avatar";
+import { Button } from "../../button";
+import Markdown from "./markdown";
 
 import {
   AgentEventData,
@@ -20,19 +20,19 @@ import {
   ToolData,
   getAnnotationData,
   getSourceAnnotationData,
-} from ".."
-import { ChatImage } from "./chat-image"
-import { ChatEvents } from "./chat-events"
-import { ChatAgentEvents } from "./chat-agent-events"
-import { ChatFiles } from "./chat-files"
-import ChatTools from "./chat-tools"
-import { ChatSources } from "./chat-sources"
-import { SuggestedQuestions } from "./chat-suggestedQuestions"
+} from "..";
+import { ChatImage } from "./chat-image";
+import { ChatEvents } from "./chat-events";
+import { ChatAgentEvents } from "./chat-agent-events";
+import { ChatFiles } from "./chat-files";
+import ChatTools from "./chat-tools";
+import { ChatSources } from "./chat-sources";
+import { SuggestedQuestions } from "./chat-suggestedQuestions";
 
 type ContentDisplayConfig = {
-  order: number
-  component: JSX.Element | null
-}
+  order: number;
+  component: JSX.Element | null;
+};
 
 function ChatMessageContent({
   message,
@@ -40,43 +40,43 @@ function ChatMessageContent({
   append,
   isLastMessage,
 }: {
-  message: Message
-  isLoading: boolean
-  append: Pick<ChatHandler, "append">["append"]
-  isLastMessage: boolean
+  message: Message;
+  isLoading: boolean;
+  append: Pick<ChatHandler, "append">["append"];
+  isLastMessage: boolean;
 }) {
-  console.log("chatMessage", message)
+  console.log("chatMessage", message);
 
-  const annotations = message.annotations as MessageAnnotation[] | undefined
-  if (!annotations?.length) return <Markdown content={message.content} />
+  const annotations = message.annotations as MessageAnnotation[] | undefined;
+  if (!annotations?.length) return <Markdown content={message.content} />;
 
   const imageData = getAnnotationData<ImageData>(
     annotations,
     MessageAnnotationType.IMAGE
-  )
+  );
   const contentFileData = getAnnotationData<DocumentFileData>(
     annotations,
     MessageAnnotationType.DOCUMENT_FILE
-  )
+  );
   const eventData = getAnnotationData<EventData>(
     annotations,
     MessageAnnotationType.EVENTS
-  )
+  );
   const agentEventData = getAnnotationData<AgentEventData>(
     annotations,
     MessageAnnotationType.AGENT_EVENTS
-  )
+  );
 
-  const sourceData = getSourceAnnotationData(annotations)
+  const sourceData = getSourceAnnotationData(annotations);
 
   const toolData = getAnnotationData<ToolData>(
     annotations,
     MessageAnnotationType.TOOLS
-  )
+  );
   const suggestedQuestionsData = getAnnotationData<SuggestedQuestionsData>(
     annotations,
     MessageAnnotationType.SUGGESTED_QUESTIONS
-  )
+  );
 
   const contents: ContentDisplayConfig[] = [
     {
@@ -128,7 +128,7 @@ function ChatMessageContent({
         />
       ) : null,
     },
-  ]
+  ];
 
   return (
     <div className="flex-1 gap-4 flex flex-col">
@@ -138,7 +138,7 @@ function ChatMessageContent({
           <Fragment key={index}>{content.component}</Fragment>
         ))}
     </div>
-  )
+  );
 }
 
 export default function ChatMessage({
@@ -147,20 +147,20 @@ export default function ChatMessage({
   append,
   isLastMessage,
 }: {
-  chatMessage: Message
-  isLoading: boolean
-  append: Pick<ChatHandler, "append">["append"]
-  isLastMessage: boolean
+  chatMessage: Message;
+  isLoading: boolean;
+  append: Pick<ChatHandler, "append">["append"];
+  isLastMessage: boolean;
 }) {
-  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
-  const inputRef = useSharedRef()
+  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 });
+  const inputRef = useSharedRef();
 
   const handleClickSuggestedQuestion = (question: string) => {
     if (inputRef?.current) {
-      inputRef.current.value = question
-      inputRef.current.dispatchEvent(new Event("input"))
+      inputRef.current.value = question;
+      inputRef.current.dispatchEvent(new Event("input"));
     }
-  }
+  };
 
   // Mockup chat message data
   const imageMockUpMessage = {
@@ -176,7 +176,7 @@ export default function ChatMessage({
             },
           ]
         : undefined,
-  }
+  };
 
   const documentFileMockUpMessage = {
     ...chatMessage,
@@ -203,7 +203,7 @@ export default function ChatMessage({
             },
           ]
         : undefined,
-  }
+  };
 
   const eventsMockUpMessage = {
     ...chatMessage,
@@ -224,7 +224,7 @@ export default function ChatMessage({
             },
           ]
         : undefined,
-  }
+  };
 
   const agentEventsMockUpMessage = {
     ...chatMessage,
@@ -245,9 +245,37 @@ export default function ChatMessage({
                 text: "csv content analyzer agent",
               },
             },
+            {
+              type: "agent",
+              data: {
+                agent: "orchestrator",
+                text: "Plan created: Let's do: Research prosidential elections",
+              },
+            },
+            {
+              type: "agent",
+              data: {
+                agent: "Researcher",
+                text: "Start to work on: upcoming predisential elections",
+              },
+            },
+            {
+              type: "agent",
+              data: {
+                agent: "Researcher",
+                text: "Finished task",
+              },
+            },
+            {
+              type: "agent",
+              data: {
+                agent: "Analyst",
+                text: "Start to work on: Analyze the gathered information about the ...",
+              },
+            },
           ]
         : undefined,
-  }
+  };
 
   const sourceMockUpMessage = {
     ...chatMessage,
@@ -280,7 +308,7 @@ export default function ChatMessage({
             },
           ]
         : undefined,
-  }
+  };
 
   const toolEventsMockUpMessage = {
     ...chatMessage,
@@ -346,7 +374,7 @@ export default function ChatMessage({
             },
           ]
         : undefined,
-  }
+  };
 
   const suggestedQuestionsMockMessage = {
     ...chatMessage,
@@ -363,7 +391,7 @@ export default function ChatMessage({
             },
           ]
         : undefined,
-  }
+  };
 
   return (
     <div className="flex items-start gap-2 md:gap-4 pr-2 md:pr-5 pt-2 md:pt-5">
@@ -371,7 +399,7 @@ export default function ChatMessage({
       <div className="group flex flex-1 justify-between gap-2">
         <div className="flex-1 space-y-4">
           <ChatMessageContent
-            message={suggestedQuestionsMockMessage}
+            message={agentEventsMockUpMessage}
             isLoading={isLoading}
             append={append}
             isLastMessage={isLastMessage}
@@ -428,5 +456,5 @@ export default function ChatMessage({
         </Button>
       </div>
     </div>
-  )
+  );
 }
