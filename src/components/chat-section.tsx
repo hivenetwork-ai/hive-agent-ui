@@ -168,7 +168,6 @@ export default function ChatSection() {
 
       <ChatInput
         handleSubmit={handleOnSubmit}
-        // onFileUpload={(file: File) => uploadFile([file])}
         isLoading={isLoading}
       />
     </div>

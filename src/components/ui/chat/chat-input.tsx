@@ -47,7 +47,7 @@ export default function ChatInput(
 
     if (selectedFiles.length > 0) {
       selectedFiles.forEach((file) => {
-        formData.append("file", file)
+        formData.append("files", file)
       })
     }
 
@@ -108,23 +108,33 @@ export default function ChatInput(
     const files = Array.from(event.target.files || [])
 
     // Filter out files
-    const validImageTypes = allowedExtensions
     const validFiles = files.filter((file) => {
-      validImageTypes.includes(file.type)
-      if (!validImageTypes.includes(file.type)) {
-        toast.warn(
-          `${file.name} is not a valid image file and will be removed.`
-        )
-        return false
+      // Check if the file type matches any of the allowed extensions
+      const isAllowed = allowedExtensions.some((ext) => {
+        // Allow exact matches (e.g., "application/pdf")
+        if (ext === file.type) return true;
+        
+        // Allow wildcard matches (e.g., "image/*" matches "image/png" or "image/jpeg")
+        if (ext.endsWith("/*")) {
+          const baseType = ext.split("/")[0];
+          return file.type.startsWith(baseType + "/");
+        }
+    
+        return false;
+      });
+    
+      if (!isAllowed) {
+        toast.warn(`${file.name} is not a valid file and will be removed.`);
+        return false;
       }
+    
       if (file.size > DEFAULT_FILE_SIZE_LIMIT) {
-        toast.warn(
-          `${file.name} exceeds the 5MB size limit and will be removed.`
-        )
-        return false
+        toast.warn(`${file.name} exceeds the 5MB size limit and will be removed.`);
+        return false;
       }
-      return true
-    })
+    
+      return true;
+    });
 
     setSelectedFiles((prevs) => [...prevs, ...validFiles])
 
@@ -199,7 +209,6 @@ export default function ChatInput(
           <FileUploader
             config={fileConfig}
             handleFileChange={handleFileChange}
-            // onFileError={props.onFileError}
           />
           <Button disabled={props.isLoading} onClick={handleButtonClick}>
             Send message
