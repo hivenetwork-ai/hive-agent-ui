@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react"
+import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { Button } from "../button"
 import FileUploader from "../file-uploader"
 import UploadImagePreview from "../upload-image-preview"
@@ -26,16 +26,19 @@ const allowedExtensions = [
 ]
 
 export default function ChatInput(
-  props: Pick<ChatHandler, "handleSubmit" | "multiModal" | "isLoading">
+  props: Pick<ChatHandler, "handleSubmit" | "isLoading">
 ) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [input, setInput] = useState<string>("")
 
   const inputRef = useSharedRef()
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const onSubmit = () => {
-    let formData: any = {}
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    let formData = new FormData()
 
     if (input === "") {
       toast.warn("Please type a message!")
@@ -43,7 +46,9 @@ export default function ChatInput(
     }
 
     if (selectedFiles.length > 0) {
-      formData.files = selectedFiles
+      selectedFiles.forEach((file) => {
+        formData.append("file", file)
+      })
     }
 
     const chatData: any = {
@@ -55,11 +60,11 @@ export default function ChatInput(
       ],
     }
 
-    formData.chat_data = chatData
-    formData.user_id = "user123"
-    formData.session_id = "session123"
+    formData.append("user_id", "user123")
+    formData.append("session_id", "session123")
+    formData.append("chat_data", JSON.stringify(chatData));
 
-    props.handleSubmit(formData)
+    props.handleSubmit(e, { data: formData });
     setInput("")
     setSelectedFiles([])
     setPreviewUrls([])
@@ -79,10 +84,19 @@ export default function ChatInput(
     setInput(e.target.value)
   }
 
+  const handleButtonClick = () => {
+    if (input.trim() === "") {
+      toast.warn("Please type a message!");
+      return;
+    }
+
+    formRef.current?.requestSubmit();
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
-      onSubmit()
+      formRef.current?.requestSubmit();
     } else if (e.key === "Enter" && e.shiftKey) {
       e.preventDefault()
       setInput((input) => input + "\n")
@@ -155,7 +169,7 @@ export default function ChatInput(
   }, [inputRef])
 
   return (
-    <div className="flex flex-col rounded-xl bg-white p-2 md:p-4 shadow-xl">
+    <form className="flex flex-col rounded-xl bg-white p-2 md:p-4 shadow-xl" ref={formRef} onSubmit={onSubmit}>
       <div className="flex items-center gap-2 flex-wrap">
         {previewUrls.length > 0 &&
           previewUrls.map((url, index) => (
@@ -187,11 +201,11 @@ export default function ChatInput(
             handleFileChange={handleFileChange}
             // onFileError={props.onFileError}
           />
-          <Button disabled={props.isLoading} onClick={onSubmit}>
+          <Button disabled={props.isLoading} onClick={handleButtonClick}>
             Send message
           </Button>
         </div>
       </div>
-    </div>
+    </form>
   )
 }
