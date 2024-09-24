@@ -6,30 +6,19 @@ import { ChatHandler } from "./chat.interface"
 import { toast } from "react-toastify"
 import { Textarea } from "../textarea"
 import { useSharedRef } from "@/context/RefProvider"
+import FilePreview from "@/components/filePreview/FilePreview"
 
 const DEFAULT_FILE_SIZE_LIMIT = 1024 * 1024 * 5
 const allowedExtensions = [
   "image/*",
-  "application/pdf",
-  ".doc",
-  ".docx",
-  ".xls",
-  ".csv",
-  ".xlsx",
-  ".ppt",
-  ".pptx",
-  ".txt",
-  ".rtf",
-  ".epub",
-  ".json",
-  ".xml",
+  "application/*",
+  "text/*",
 ]
 
 export default function ChatInput(
   props: Pick<ChatHandler, "handleSubmit" | "isLoading">
 ) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
-  const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [input, setInput] = useState<string>("")
 
   const inputRef = useSharedRef()
@@ -67,17 +56,13 @@ export default function ChatInput(
     props.handleSubmit(e, { data: formData });
     setInput("")
     setSelectedFiles([])
-    setPreviewUrls([])
   }
 
-  const onRemovePreviewImage = (index: number) => {
-    const updatedFiles = [...selectedFiles]
-    const updatedUrls = [...previewUrls]
-    updatedFiles.splice(index, 1)
-    updatedUrls.splice(index, 1)
-
-    setSelectedFiles(updatedFiles)
-    setPreviewUrls(updatedUrls)
+  const onRemovePreviewFile = (index: number) => {
+    setSelectedFiles((prevFiles) => {
+      prevFiles.splice(index, 1)
+      return [...prevFiles]
+    })
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -104,11 +89,11 @@ export default function ChatInput(
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log("first")
     const files = Array.from(event.target.files || [])
 
     // Filter out files
     const validFiles = files.filter((file) => {
+      console.log("filefile", file)
       // Check if the file type matches any of the allowed extensions
       const isAllowed = allowedExtensions.some((ext) => {
         // Allow exact matches (e.g., "application/pdf")
@@ -137,9 +122,6 @@ export default function ChatInput(
     });
 
     setSelectedFiles((prevs) => [...prevs, ...validFiles])
-
-    const urls = validFiles.map((file) => URL.createObjectURL(file))
-    setPreviewUrls((prevs) => [...prevs, ...urls])
   }
 
   const fileConfig = {
@@ -180,19 +162,19 @@ export default function ChatInput(
 
   return (
     <form className="flex flex-col rounded-xl bg-white p-2 md:p-4 shadow-xl" ref={formRef} onSubmit={onSubmit}>
-      <div className="flex items-center gap-2 flex-wrap">
-        {previewUrls.length > 0 &&
-          previewUrls.map((url, index) => (
-            <UploadImagePreview
-              url={url}
-              key={url}
-              onRemove={() => onRemovePreviewImage(index)}
+      <div className="flex items-center gap-2 overflow-x-auto pt-[7px]">
+        {selectedFiles.length > 0 &&
+          selectedFiles.map((file: File, index: number) => (
+            <FilePreview
+              file={file}
+              key={`file-${index}`}
+              onRemove={() => onRemovePreviewFile(index)}
             />
           ))}
       </div>
       <div
         className={`flex flex-col md:flex-row w-full items-start justify-between gap-2 md:gap-4 ${
-          previewUrls.length > 0 && "mt-1 md:mt-4"
+          selectedFiles.length > 0 && "mt-1"
         }`}
       >
         <Textarea
