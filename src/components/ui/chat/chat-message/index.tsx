@@ -399,7 +399,7 @@ export default function ChatMessage({
       <div className="group flex flex-1 justify-between gap-2">
         <div className="flex-1 space-y-4">
           <ChatMessageContent
-            message={agentEventsMockUpMessage}
+            message={chatMessage}
             isLoading={isLoading}
             append={append}
             isLastMessage={isLastMessage}

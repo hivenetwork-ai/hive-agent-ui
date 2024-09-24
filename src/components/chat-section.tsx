@@ -6,7 +6,7 @@ import { useSelector } from "react-redux"
 import { RootState } from "@/store"
 import { useAppDispatch } from "@/store/hooks"
 import { setTransformedMessages } from "@/features/chatSlice"
-import { sendChatAPI, sendChatMediaAPI } from "@/apis/chat"
+import { sendChatAPI } from "@/apis/chat"
 import { toast } from "react-toastify"
 import { uploadFileAPI } from "@/apis/fileupload"
 import { useSharedRef } from "@/context/RefProvider"
@@ -21,60 +21,41 @@ export default function ChatSection() {
 
   const inputRef = useSharedRef()
 
-  const handleOnSubmit = async (data: any) => {
+  const handleOnSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+    ops?: {
+      data?: FormData;
+    }
+  ) => {
     try {
-      setFormData(data)
+      e.preventDefault();
+
+      if (!ops?.data) return
+
+      // Convert FormData to a standard object
+      const formDataObj: any = {};
+      ops.data.forEach((value, key) => {
+        if (key === "chat_data") {
+          formDataObj[key] = JSON.parse(value as string);
+        } else {
+          formDataObj[key] = value;
+        }
+      });
+
+      setFormData(formDataObj)
       dispatch(
         setTransformedMessages([
           ...transformedMessages,
-          data.chat_data.messages[0],
+          formDataObj.chat_data.messages[0],
         ])
       )
+
       setIsLoading(true)
-      if (data.files?.length > 0) {
-        const mediaFormData = new FormData()
-        const fileFormData = new FormData()
-        mediaFormData.append("user_id", data.user_id)
-        mediaFormData.append("session_id", data.session_id)
-        mediaFormData.append("chat_data", JSON.stringify(data.chat_data))
-
-        let mediaFileCount = 0
-        let otherFileCount = 0
-        data.files.forEach((file: any) => {
-          if (file?.type.startsWith("image/")) {
-            mediaFileCount++
-            mediaFormData.append("files", file)
-          } else {
-            otherFileCount++
-            fileFormData.append("files", file)
-          }
-        })
-
-        if (mediaFileCount) {
-          await sendChatMediaAPI(mediaFormData)
-        }
-        if (mediaFileCount) {
-          await uploadFileAPI(fileFormData)
-        }
-      }
-      const media_references: any[] = []
-      data.files?.forEach((file: any) => {
-        media_references.push({
-          type: "file_name",
-          value: file.name,
-        })
-      })
-      const formData: any = {
-        user_id: data.user_id,
-        session_id: data.session_id,
-        chat_data: data.chat_data,
-        media_references,
-      }
-      const resChat = await sendChatAPI(formData)
+      const resChat = await sendChatAPI(ops.data)
       dispatch(
         setTransformedMessages([
           ...transformedMessages,
-          formData.chat_data.messages[0],
+          formDataObj.chat_data.messages[0],
           {
             role: "system",
             content: resChat,
@@ -117,9 +98,9 @@ export default function ChatSection() {
       }
 
       // const response = await sendChatAPI(message, ops)
-      const response = await sendChatAPI(message)
+      // const response = await sendChatAPI(message)
 
-      return response
+      // return response
     } catch (error) {
       console.error("Error in append function:", error)
       return Promise.resolve(null)
@@ -187,9 +168,7 @@ export default function ChatSection() {
 
       <ChatInput
         handleSubmit={handleOnSubmit}
-        // onFileUpload={(file: File) => uploadFile([file])}
         isLoading={isLoading}
-        multiModal={process.env.NEXT_PUBLIC_MODEL === "gpt-4-vision-preview"}
       />
     </div>
   )
