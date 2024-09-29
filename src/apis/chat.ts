@@ -1,9 +1,9 @@
 import { API_URL } from "@/config/constants";
 import axios from "axios";
 
-export const sendChatAPI = async (formData: FormData) => {
+export const sendChatAPI = async (data: any) => {
   try {
-    const response = await axios.post(`${API_URL}/api/v1/chat`, formData, {
+    const response = await axios.post(`${API_URL}/api/v1/chat`, data, {
       headers: {
         accept: "application/json",
         "Content-Type": "multipart/form-data",

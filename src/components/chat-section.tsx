@@ -24,7 +24,7 @@ export default function ChatSection() {
   const handleOnSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
     ops?: {
-      data?: FormData;
+      data?: any;
     }
   ) => {
     try {
@@ -32,30 +32,32 @@ export default function ChatSection() {
 
       if (!ops?.data) return
 
-      // Convert FormData to a standard object
-      const formDataObj: any = {};
-      ops.data.forEach((value, key) => {
-        if (key === "chat_data") {
-          formDataObj[key] = JSON.parse(value as string);
-        } else {
-          formDataObj[key] = value;
-        }
-      });
+      let data: any = {};
 
-      setFormData(formDataObj)
+      data.user_id =  ops.data.userId;
+      data.session_id = ops.data.sessionId;
+      data.chat_data = JSON.stringify(ops.data.chatData);
+
+      if (ops.data.files && ops.data.files.length > 0 ) {
+        data.files = ops.data.files
+      }
+
+      setFormData(data)
+
       dispatch(
         setTransformedMessages([
           ...transformedMessages,
-          formDataObj.chat_data.messages[0],
+          ...ops.data.chatData.messages,
         ])
       )
 
+
       setIsLoading(true)
-      const resChat = await sendChatAPI(ops.data)
+      const resChat = await sendChatAPI(data)
       dispatch(
         setTransformedMessages([
           ...transformedMessages,
-          formDataObj.chat_data.messages[0],
+          ...ops.data.chatData.messages,
           {
             role: "system",
             content: resChat,
