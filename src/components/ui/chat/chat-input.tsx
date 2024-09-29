@@ -27,7 +27,7 @@ export default function ChatInput(
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let formData = new FormData()
+    let data: any = {}
 
     if (input === "") {
       toast.warn("Please type a message!")
@@ -35,9 +35,10 @@ export default function ChatInput(
     }
 
     if (selectedFiles.length > 0) {
-      selectedFiles.forEach((file) => {
-        formData.append("files", file)
-      })
+      data.files = selectedFiles
+      // selectedFiles.forEach((file) => {
+      //   formData.append("files", file)
+      // })
     }
 
     const chatData: any = {
@@ -46,14 +47,14 @@ export default function ChatInput(
           role: "user",
           content: input,
         },
-      ],
+      ]
     }
 
-    formData.append("user_id", "user123")
-    formData.append("session_id", "session123")
-    formData.append("chat_data", JSON.stringify(chatData));
+    data.userId = "user123"
+    data.sessionId = "session123"
+    data.chatData = chatData
 
-    props.handleSubmit(e, { data: formData });
+    props.handleSubmit(e, { data });
     setInput("")
     setSelectedFiles([])
   }
